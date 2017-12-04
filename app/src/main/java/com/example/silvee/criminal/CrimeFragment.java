@@ -16,6 +16,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -28,11 +30,14 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
     public static final String ARG_CRIME_ID = "crime_id";
     public static final String DIALOG_DATE = "DialogDate";
+    public static final String DIALOG_TIME = "DialogTime";
     public static final int REQUEST_DATE = 0;
+    public static final int REQUEST_TIME = 1;
 
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mTimeButton;
     private CheckBox mSolvedCheckbox;
 
     @Override
@@ -82,6 +87,18 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mTimeButton= v.findViewById(R.id.crime_time);
+        updateTime();
+        mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getFragmentManager();
+                TimePickerFragment timePickerFragment = TimePickerFragment.newInstance(mCrime.getDate());
+                timePickerFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+                timePickerFragment.show(fm, DIALOG_TIME);
+            }
+        });
+
         mSolvedCheckbox = v.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());
         mSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -104,11 +121,23 @@ public class CrimeFragment extends Fragment {
             mCrime.setDate(date);
             updateDate();
         }
-
+        if (requestCode == REQUEST_TIME) {
+            Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            mCrime.setDate(date);
+            updateTime();
+        }
     }
 
     private void updateDate() {
-        mDateButton.setText(mCrime.getDate().toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
+        mDateButton.setText(sdf.format(mCrime.getDate()));
+        returnResult();
+    }
+
+    private void updateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        mTimeButton.setText(sdf.format(mCrime.getDate()));
+        returnResult();
     }
 
     // Create an instance of current CrimeFragment and put id of Crime as an Argument to it
