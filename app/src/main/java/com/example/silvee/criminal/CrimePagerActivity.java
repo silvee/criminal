@@ -61,6 +61,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         // Setting Adapter for ViewPager
         FragmentManager fragmentManager = getSupportFragmentManager();
         viewPager.setAdapter(new FragmentStatePagerAdapter(fragmentManager) {
+            // Return CrimeFragment instance
             @Override
             public Fragment getItem(int position) {
                 Crime crime = mCrimes.get(position);
@@ -74,7 +75,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         });
 
 
-        // Open Crime that was clicked, not the first
+        // Open Crime that was clicked due position, not the first
         UUID crimeID = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
         for (Crime crime : mCrimes) {
             if (crime.getId().equals(crimeID)) {
@@ -86,6 +87,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         }
     }
 
+    // Put id of Crime in intent so that viewpager shows the correct one
     public static Intent newIntent(Context packageContext, UUID CrimeID) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, CrimeID);

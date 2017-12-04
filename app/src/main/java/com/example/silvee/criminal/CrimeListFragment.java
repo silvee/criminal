@@ -50,6 +50,7 @@ public class CrimeListFragment extends Fragment {
         super.onResume();
     }
 
+    // Get result containing id of Crime from CrimeFragment and update item that was changed
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CRIME) {
@@ -63,19 +64,20 @@ public class CrimeListFragment extends Fragment {
     private abstract class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mTitleTextView;
         TextView mDateTextview;
-        protected Crime mCrime;
+        private Crime mCrime;
 
-        public CrimeHolder(View v) {
+        private CrimeHolder(View v) {
             super(v);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Crime crime) {
+        private void bind(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextview.setText(DateFormat.format("EEE, MMM d, yyyy", mCrime.getDate()));
         }
 
+        // start CrimePagerActivity if item clicked
         @Override
         public void onClick(View v) {
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
@@ -84,20 +86,21 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
-    private class SimpleCrimeHolder extends CrimeHolder{
+    private class SimpleCrimeHolder extends CrimeHolder {
 
         // Constructor
-        public SimpleCrimeHolder(LayoutInflater inflater, ViewGroup parent)  {
+        private SimpleCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_crime, parent, false));
             mTitleTextView = itemView.findViewById(R.id.crimeTitle);
             mDateTextview = itemView.findViewById(R.id.crimeDate);
         }
     }
 
+    // CrimeHolder with extra "Send police" button
     private class PoliceCrimeHolder extends CrimeHolder {
         Button mSendPoliceButton;
 
-        public PoliceCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
+        private PoliceCrimeHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_police_crime, parent, false));
             mTitleTextView = itemView.findViewById(R.id.policeCrimeTitle);
             mDateTextview = itemView.findViewById(R.id.policeCrimeDate);
@@ -143,14 +146,16 @@ public class CrimeListFragment extends Fragment {
     }
 
 
-    // Create adapter and link it to recyclerview
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
         if (mAdapter == null) {
+            // Create adapter and link it to recyclerview
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
+            // Update items
             mAdapter.notifyDataSetChanged();
         }
     }

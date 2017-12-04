@@ -69,6 +69,9 @@ public class CrimeFragment extends Fragment {
 
         mDateButton = v.findViewById(R.id.crime_date);
         updateDate();
+        // When date clicked: create DatePickerFragment and pass date of crime as an argument to it.
+        // Also make current CrimeFragment as a target of created one for updating the date in CrimeFragment
+        // if date was changed
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +95,7 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    // Updating date field if it was changed in DatePickerFragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) return;
@@ -107,6 +111,7 @@ public class CrimeFragment extends Fragment {
         mDateButton.setText(mCrime.getDate().toString());
     }
 
+    // Create an instance of current CrimeFragment and put id of Crime as an Argument to it
     public static CrimeFragment newInstance(UUID mID) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, mID);
@@ -116,6 +121,7 @@ public class CrimeFragment extends Fragment {
         return fragment;
     }
 
+    // return position of Crime to CrimeListFragment every time the Crime data changes
     private void returnResult() {
         Intent intent = new Intent();
         int pos = CrimeLab.get(getActivity()).getCrimes().indexOf(mCrime);
