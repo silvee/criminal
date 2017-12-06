@@ -5,10 +5,14 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,13 +29,16 @@ public class CrimeListFragment extends Fragment {
     private static final int REQUIRE_POLICE = 1;
     private static final int NOT_REQUIRE_POLICE = 0;
     private static final int REQUEST_CRIME = 1;
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private boolean mSubtitleVisible;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -41,6 +48,10 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        if (savedInstanceState != null) {
+            mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        }
+
         updateUI();
         return view;
     }
@@ -48,6 +59,13 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        updateUI();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
     // Get result containing id of Crime from CrimeFragment and update item that was changed
@@ -59,6 +77,47 @@ public class CrimeListFragment extends Fragment {
                 updateSingleView(pos);
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime_list, menu);
+        MenuItem menuItem = menu.findItem(R.id.show_subtitle);
+        if (mSubtitleVisible) {
+            menuItem.setTitle(R.string.hide_subtitle);
+        } else {
+            menuItem.setTitle(R.string.show_subtitle);
+        }
+    }
+
+    // Item of Option menu clicked
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.new_crime:
+                Crime crime = new Crime();
+                CrimeLab.get(getActivity()).add(crime);
+                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);
+                return true;
+            case R.id.show_subtitle:
+                mSubtitleVisible = !mSubtitleVisible;
+                getActivity().invalidateOptionsMenu();
+                updateSubtitle();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // Show number of crimes in action bar
+    private void updateSubtitle() {
+        int nCrimes = CrimeLab.get(getActivity()).getCrimes().size();
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_plural, nCrimes, nCrimes);
+        if (!mSubtitleVisible) subtitle = null;
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
     private abstract class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -158,6 +217,7 @@ public class CrimeListFragment extends Fragment {
             // Update items
             mAdapter.notifyDataSetChanged();
         }
+        updateSubtitle();
     }
 
     private void updateSingleView(int pos) {
