@@ -16,9 +16,6 @@ public class Crime {
     private boolean mRequirePolice;
 
 
-
-
-
     // Getters and setters
     public UUID getId() {
         return mId;
@@ -43,7 +40,11 @@ public class Crime {
 
 
     public Crime() {
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public Crime(UUID id) {
+        mId = id;
         mDate = new Date();
     }
 }
