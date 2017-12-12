@@ -14,7 +14,7 @@ public class Crime {
     private Date mDate;
     private boolean mSolved;
     private boolean mRequirePolice;
-
+    private String mSuspect;
 
     // Getters and setters
     public UUID getId() {
@@ -36,7 +36,13 @@ public class Crime {
     }
     public boolean requirePolice() { return mRequirePolice; }
     public void setRequirePolice(boolean mRequirePolice) { this.mRequirePolice = mRequirePolice; }
+    public String getSuspect() {
+        return mSuspect;
+    }
 
+    public void setSuspect(String mSuspect) {
+        this.mSuspect = mSuspect;
+    }
 
 
     public Crime() {
