@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -42,6 +43,7 @@ public class CrimeFragment extends Fragment {
     public static final int REQUEST_DATE = 0;
     public static final int REQUEST_TIME = 1;
     public static final int REQUEST_CONTACT = 2;
+    public static final int REQUEST_CALL = 3;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -50,6 +52,8 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckbox;
     private Button mSuspectButton;
     private Button mSendReportButton;
+    private Button mCallButton;
+    private String contactId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,6 +129,7 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        // Set crime solved/unsolved
         mSolvedCheckbox = v.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());
         mSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -135,6 +140,7 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        // Choose suspect from contacts
         mSuspectButton = v.findViewById(R.id.choose_suspect_button);
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,6 +152,7 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(mCrime.getSuspect());
         }
 
+        // Share crime report via other app
         mSendReportButton = v.findViewById(R.id.send_report_button);
         mSendReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,6 +167,36 @@ public class CrimeFragment extends Fragment {
 //                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
 //                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
 //                intent = Intent.createChooser(intent, getString(R.string.send_report_via));
+                startActivity(intent);
+            }
+        });
+
+        // make a call to chosen contact
+        mCallButton = v.findViewById(R.id.call_button);
+        mCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Cursor cursor = getActivity().getContentResolver().query(
+                        CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        CommonDataKinds.Phone.CONTACT_ID +" = ?",
+                        new String[]{contactId}, null);
+                String tel = "";
+
+                try {
+                    if (cursor.getCount() != 0) {
+                        cursor.moveToFirst();
+                        tel = cursor.getString(cursor.getColumnIndex(CommonDataKinds.Phone.NUMBER));
+                    }
+
+                } finally {
+                    cursor.close();
+                }
+
+                //String tel = "111-333-222-4";
+                String uri = "tel:" + tel.trim() ;
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse(uri));
                 startActivity(intent);
             }
         });
@@ -201,12 +238,14 @@ public class CrimeFragment extends Fragment {
         }
         if (requestCode == REQUEST_CONTACT && data != null) {
             Uri contactUri = data.getData();
-            String[] queryFields = new String[] {ContactsContract.Contacts.DISPLAY_NAME};
+            String[] queryFields = new String[] {ContactsContract.Contacts.DISPLAY_NAME , ContactsContract.Contacts._ID};
             Cursor cursor = getActivity().getContentResolver().query(contactUri,  queryFields,null, null, null);
+
             try {
                 if (cursor.getCount() == 0) return;
                 cursor.moveToFirst();
-                String suspect = cursor.getString(0);
+                String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
             } finally {
