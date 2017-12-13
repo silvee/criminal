@@ -9,6 +9,7 @@ import com.example.silvee.criminal.database.CrimeDatabaseHelper;
 import com.example.silvee.criminal.database.CrimeDbSchema;
 import com.example.silvee.criminal.database.CrimeDbSchema.CrimeTable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -103,5 +104,10 @@ public class CrimeLab {
             cursor.close();
         }
         return crimes;
+    }
+
+    public File getPhotoFile(Crime crime) {
+        File photoFile = mContext.getFilesDir();
+        return new File(photoFile, crime.getPhotoFilename());
     }
 }

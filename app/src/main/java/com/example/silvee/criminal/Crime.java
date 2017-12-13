@@ -44,7 +44,6 @@ public class Crime {
         this.mSuspect = mSuspect;
     }
 
-
     public Crime() {
         this(UUID.randomUUID());
     }
@@ -52,5 +51,9 @@ public class Crime {
     public Crime(UUID id) {
         mId = id;
         mDate = new Date();
+    }
+
+    public String getPhotoFilename() {
+        return "IMG_" + mId.toString() + ".jpg";
     }
 }

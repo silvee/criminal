@@ -17,6 +17,7 @@
     <string name="choose_suspect">Choose suspect</string>
     <string name="send_report">Send crime report</string>
     <string name="call_label">Make a call</string>
+    <string name="call_hint">You must choose a suspect to make a call</string>
     <plurals name="subtitle_plural">
         <item quantity="one">%1$d crime</item>
         <item quantity="other">%1$d crimes</item>
