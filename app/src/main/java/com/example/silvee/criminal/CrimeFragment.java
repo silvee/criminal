@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -103,7 +104,7 @@ public class CrimeFragment extends Fragment {
                 PackageManager.MATCH_DEFAULT_ONLY) != null && mPhotoFile != null;
 
         mPhotoView = v.findViewById(R.id.photo_view);
-        updatePhotoView();
+        //updatePhotoView();
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +113,12 @@ public class CrimeFragment extends Fragment {
                 fullImageFragment.show(fm, DIALOG_DATE);
             }
         });
+        mPhotoView.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override public void onGlobalLayout() {
+                        updatePhotoView();
+                    }
+                });
 
         mPhotoButton = v.findViewById(R.id.photo_button);
         mPhotoButton.setEnabled(canTakePhoto);
@@ -232,21 +239,33 @@ public class CrimeFragment extends Fragment {
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Cursor cursor = getActivity().getContentResolver().query(
+//                Cursor cursor = getActivity().getContentResolver().query(
+//                        CommonDataKinds.Phone.CONTENT_URI,
+//                        null,
+//                        CommonDataKinds.Phone.CONTACT_ID +" = ?",
+//                        new String[]{contactId}, null);
+//
+//
+//                try {
+//                    if (cursor.getCount() != 0) {
+//                        cursor.moveToFirst();
+//                        tel = cursor.getString(cursor.getColumnIndex(CommonDataKinds.Phone.NUMBER));
+//                    }
+//
+//                } finally {
+//                    cursor.close();
+//                }
+
+                String tel = "";
+                try (Cursor cursor = getActivity().getContentResolver().query(
                         CommonDataKinds.Phone.CONTENT_URI,
                         null,
                         CommonDataKinds.Phone.CONTACT_ID +" = ?",
-                        new String[]{contactId}, null);
-                String tel = "";
-
-                try {
+                        new String[]{contactId}, null)) {
                     if (cursor.getCount() != 0) {
                         cursor.moveToFirst();
                         tel = cursor.getString(cursor.getColumnIndex(CommonDataKinds.Phone.NUMBER));
                     }
-
-                } finally {
-                    cursor.close();
                 }
 
                 //String tel = "111-333-222-4";
@@ -292,12 +311,13 @@ public class CrimeFragment extends Fragment {
             mCrime.setDate(date);
             updateTime();
         }
-        if (requestCode == REQUEST_CONTACT && data != null) {
+        if (requestCode == REQUEST_CONTACT && data.getData() != null) {
             Uri contactUri = data.getData();
             String[] queryFields = new String[] {ContactsContract.Contacts.DISPLAY_NAME , ContactsContract.Contacts._ID};
-            Cursor cursor = getActivity().getContentResolver().query(contactUri,  queryFields,null, null, null);
 
-            try {
+
+            try (Cursor cursor = getActivity().getContentResolver().query(contactUri,  queryFields,
+                        null, null, null)) {
                 if (cursor.getCount() == 0) return;
                 cursor.moveToFirst();
                 String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
@@ -305,8 +325,6 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
                 mCallButton.setEnabled(true);
-            } finally {
-                cursor.close();
             }
         }
         if (requestCode == REQUEST_PHOTO) {
@@ -332,7 +350,7 @@ public class CrimeFragment extends Fragment {
 
 
     private String getCrimeReport() {
-        String solvedString = null;
+        String solvedString;
         if (mCrime.isSolved()) {
             solvedString = getString(R.string.crime_report_solved);
         } else {
@@ -347,9 +365,8 @@ public class CrimeFragment extends Fragment {
         } else {
             suspect = getString(R.string.crime_report_suspect, suspect);
         }
-        String report = getString(R.string.crime_report,
-                mCrime.getTitle(), dateString, solvedString, suspect);
-        return report;
+
+        return getString(R.string.crime_report, mCrime.getTitle(), dateString, solvedString, suspect);
     }
 
     private void updatePhotoView() {

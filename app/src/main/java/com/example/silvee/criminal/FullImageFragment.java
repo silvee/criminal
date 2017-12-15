@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TimePicker;
 
@@ -29,7 +30,8 @@ import java.util.Date;
 public class FullImageFragment extends DialogFragment {
     public static final String ARG_PHOTO_FILE = "photo_file";
 
-    private ImageView mFullPhotoImage;
+    private ImageView fullPhotoImage;
+    private Button cancelButton;
 
     @Nullable
     @Override
@@ -37,13 +39,21 @@ public class FullImageFragment extends DialogFragment {
         File photoFile = (File) getArguments().getSerializable(ARG_PHOTO_FILE);
         View v = inflater.inflate(R.layout.dialog_fullimage, container, false);
 
-        mFullPhotoImage = v.findViewById(R.id.dialog_full_image);
+        fullPhotoImage = v.findViewById(R.id.dialog_full_image);
         if (photoFile == null || !photoFile.exists()) {
-            mFullPhotoImage.setImageDrawable(null);
+            fullPhotoImage.setImageDrawable(null);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
-            mFullPhotoImage.setImageBitmap(bitmap);
+            fullPhotoImage.setImageBitmap(bitmap);
         }
+
+        cancelButton =  v.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
         return v;
     }
 
