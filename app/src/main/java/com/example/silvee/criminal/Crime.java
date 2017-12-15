@@ -39,7 +39,6 @@ public class Crime {
     public String getSuspect() {
         return mSuspect;
     }
-
     public void setSuspect(String mSuspect) {
         this.mSuspect = mSuspect;
     }

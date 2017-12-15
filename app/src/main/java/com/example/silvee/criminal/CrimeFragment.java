@@ -1,6 +1,7 @@
 package com.example.silvee.criminal;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -68,6 +69,23 @@ public class CrimeFragment extends Fragment {
     private Button mSendReportButton;
     private Button mCallButton;
     private String contactId;
+    private Callbacks callbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +122,7 @@ public class CrimeFragment extends Fragment {
                 PackageManager.MATCH_DEFAULT_ONLY) != null && mPhotoFile != null;
 
         mPhotoView = v.findViewById(R.id.photo_view);
-        //updatePhotoView();
+        updatePhotoView();
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,12 +131,12 @@ public class CrimeFragment extends Fragment {
                 fullImageFragment.show(fm, DIALOG_DATE);
             }
         });
-        mPhotoView.getViewTreeObserver()
-                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override public void onGlobalLayout() {
-                        updatePhotoView();
-                    }
-                });
+//        mPhotoView.getViewTreeObserver()
+//                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                    @Override public void onGlobalLayout() {
+//                        updatePhotoView();
+//                    }
+//                });
 
         mPhotoButton = v.findViewById(R.id.photo_button);
         mPhotoButton.setEnabled(canTakePhoto);
@@ -152,6 +170,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
                 returnResult();
             }
 
@@ -195,6 +214,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mCrime.setSolved(isChecked);
+                updateCrime();
                 returnResult();
             }
         });
@@ -221,11 +241,6 @@ public class CrimeFragment extends Fragment {
                         .setSubject(getString(R.string.crime_report_subject))
                         .setType("text/plain")
                         .getIntent();
-//                Intent intent = new Intent(Intent.ACTION_SEND);
-//                intent.setType("text/plain");
-//                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-//                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-//                intent = Intent.createChooser(intent, getString(R.string.send_report_via));
                 startActivity(intent);
             }
         });
@@ -239,23 +254,6 @@ public class CrimeFragment extends Fragment {
         mCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Cursor cursor = getActivity().getContentResolver().query(
-//                        CommonDataKinds.Phone.CONTENT_URI,
-//                        null,
-//                        CommonDataKinds.Phone.CONTACT_ID +" = ?",
-//                        new String[]{contactId}, null);
-//
-//
-//                try {
-//                    if (cursor.getCount() != 0) {
-//                        cursor.moveToFirst();
-//                        tel = cursor.getString(cursor.getColumnIndex(CommonDataKinds.Phone.NUMBER));
-//                    }
-//
-//                } finally {
-//                    cursor.close();
-//                }
-
                 String tel = "";
                 try (Cursor cursor = getActivity().getContentResolver().query(
                         CommonDataKinds.Phone.CONTENT_URI,
@@ -304,11 +302,13 @@ public class CrimeFragment extends Fragment {
         if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
+            updateCrime();
             updateDate();
         }
         if (requestCode == REQUEST_TIME) {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mCrime.setDate(date);
+            updateCrime();
             updateTime();
         }
         if (requestCode == REQUEST_CONTACT && data.getData() != null) {
@@ -323,6 +323,7 @@ public class CrimeFragment extends Fragment {
                 String suspect = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 mCrime.setSuspect(suspect);
+                updateCrime();
                 mSuspectButton.setText(suspect);
                 mCallButton.setEnabled(true);
             }
@@ -332,8 +333,14 @@ public class CrimeFragment extends Fragment {
                     "com.example.silvee.criminal.fileprovider",
                     mPhotoFile);
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updateCrime();
             updatePhotoView();
         }
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).update(mCrime);
+        callbacks.onCrimeUpdated(mCrime);
     }
 
     private void updateDate() {
