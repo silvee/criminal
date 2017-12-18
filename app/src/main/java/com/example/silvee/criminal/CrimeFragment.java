@@ -122,7 +122,6 @@ public class CrimeFragment extends Fragment {
                 PackageManager.MATCH_DEFAULT_ONLY) != null && mPhotoFile != null;
 
         mPhotoView = v.findViewById(R.id.photo_view);
-        updatePhotoView();
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,12 +130,8 @@ public class CrimeFragment extends Fragment {
                 fullImageFragment.show(fm, DIALOG_DATE);
             }
         });
-//        mPhotoView.getViewTreeObserver()
-//                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//                    @Override public void onGlobalLayout() {
-//                        updatePhotoView();
-//                    }
-//                });
+        updatePhotoView();
+
 
         mPhotoButton = v.findViewById(R.id.photo_button);
         mPhotoButton.setEnabled(canTakePhoto);
@@ -347,9 +342,6 @@ public class CrimeFragment extends Fragment {
         Date date = mCrime.getDate();
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(getContext());
         mDateButton.setText(dateFormat.format(mCrime.getDate()));
-        //mDateButton.setText("Time: " + dateFormat.format(date));
-//        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
-//        mDateButton.setText(sdf.format(mCrime.getDate()));
        returnResult();
     }
 
@@ -357,11 +349,6 @@ public class CrimeFragment extends Fragment {
         Date date = mCrime.getDate();
         java.text.DateFormat dateFormat = DateFormat.getTimeFormat(getContext());
         mTimeButton.setText(dateFormat.format(mCrime.getDate()));
-        //mDateButton.setText("Time: " + dateFormat.format(date));
-//        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
-//        mDateButton.setText(sdf.format(mCrime.getDate()));
-//        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-//        mTimeButton.setText(sdf.format(mCrime.getDate()));
         returnResult();
     }
 
@@ -389,9 +376,11 @@ public class CrimeFragment extends Fragment {
     private void updatePhotoView() {
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoView.setImageDrawable(null);
+            mPhotoView.setClickable(false);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
+            mPhotoView.setClickable(true);
         }
     }
 
