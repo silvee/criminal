@@ -344,14 +344,24 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
-        mDateButton.setText(sdf.format(mCrime.getDate()));
-        returnResult();
+        Date date = mCrime.getDate();
+        java.text.DateFormat dateFormat = DateFormat.getDateFormat(getContext());
+        mDateButton.setText(dateFormat.format(mCrime.getDate()));
+        //mDateButton.setText("Time: " + dateFormat.format(date));
+//        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
+//        mDateButton.setText(sdf.format(mCrime.getDate()));
+       returnResult();
     }
 
     private void updateTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-        mTimeButton.setText(sdf.format(mCrime.getDate()));
+        Date date = mCrime.getDate();
+        java.text.DateFormat dateFormat = DateFormat.getTimeFormat(getContext());
+        mTimeButton.setText(dateFormat.format(mCrime.getDate()));
+        //mDateButton.setText("Time: " + dateFormat.format(date));
+//        SimpleDateFormat sdf = new SimpleDateFormat("d MMM, yyyy");
+//        mDateButton.setText(sdf.format(mCrime.getDate()));
+//        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+//        mTimeButton.setText(sdf.format(mCrime.getDate()));
         returnResult();
     }
 

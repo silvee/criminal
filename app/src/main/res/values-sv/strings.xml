@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Criminal</string>
+    <string name="crime_title_label">Brott</string>
+    <string name="crime_title_hint">Skriva kriminalitetnamn</string>
+    <string name="crime_details_label">Detaljer</string>
+    <string name="crime_solved_label">Löst</string>
+    <string name="next_button">Nästa</string>
+    <string name="previous_button">Tidigare</string>
+    <string name="date_picker_title">Datum för brott</string>
+    <string name="time_picker_title">Tidpunkt för brott</string>
+    <string name="new_crime">Nytt brott</string>
+    <string name="show_subtitle">Visa undertexter</string>
+    <string name="hide_subtitle">Dölja undertexter</string>
+    <string name="subtitle_format">%1$d brott</string>
+    <string name="delete_crime">Ta bort brott</string>
+    <string name="list_empty">Brottslistan är tom</string>
+    <string name="choose_suspect">Välj misstänkt</string>
+    <string name="send_report">Skicka brottsrapport</string>
+    <string name="call_label">Ringa</string>
+    <string name="call_hint">Du måste välja en misstänkt att ringa</string>
+    <plurals name="subtitle_plural">
+        <item quantity="one">%1$d brott</item>
+        <item quantity="other">%1$d brott</item>
+    </plurals>
+    <string name="crime_report">%1$s!
+        Brottet upptäcktes %2$s. %3$s, and %4$s
+    </string>
+    <string name="crime_report_solved">Ärendet löst</string>
+    <string name="crime_report_unsolved">Ärendet är inte löst</string>
+    <string name="crime_report_no_suspect">Det finns ingen misstänkt.</string>
+    <string name="crime_report_suspect">Misstänkte är %s.</string>
+    <string name="crime_report_subject">CriminalIntent Crime Report</string>
+    <string name="send_report_via">Skicka brottsrapport via</string>
+    <string name="imageview_description">Photo Image</string>
+</resources>
