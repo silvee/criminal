@@ -261,7 +261,6 @@ public class CrimeFragment extends Fragment {
                     }
                 }
 
-                //String tel = "111-333-222-4";
                 String uri = "tel:" + tel.trim() ;
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse(uri));
@@ -342,7 +341,7 @@ public class CrimeFragment extends Fragment {
         Date date = mCrime.getDate();
         java.text.DateFormat dateFormat = DateFormat.getDateFormat(getContext());
         mDateButton.setText(dateFormat.format(mCrime.getDate()));
-       returnResult();
+        returnResult();
     }
 
     private void updateTime() {
@@ -395,7 +394,7 @@ public class CrimeFragment extends Fragment {
         return fragment;
     }
 
-    // return position of Crime to CrimeListFragment every time the Crime data changes
+    // return position of Crime to CrimeListFragment using Intent every time the Crime data changes
     private void returnResult() {
         Intent intent = new Intent();
         int pos = CrimeLab.get(getActivity()).getCrimes().indexOf(mCrime);

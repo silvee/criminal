@@ -258,13 +258,11 @@ public class CrimeListFragment extends Fragment {
                 @Override
                 public boolean onMove(RecyclerView recyclerView,
                                       RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                    //mAdapter.move(viewHolder.getAdapterPosition(), target.getAdapterPosition());
                     return true;
                 }
 
                 @Override
                 public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                    //mAdapter.remove(viewHolder.getAdapterPosition());
                     mAdapter.remove(viewHolder.getAdapterPosition());
                 }
             });

@@ -89,7 +89,7 @@ public class CrimeLab {
         }
     }
 
-    // get all strings from database, convert them to Crime objects and them to List
+    // get all strings from database, convert them to Crime objects and add to a List
     public List<Crime> getCrimes() {
         List<Crime> crimes = new ArrayList<>();
         CrimeCursorWrapper cursor = queryCrimes(null, null);
